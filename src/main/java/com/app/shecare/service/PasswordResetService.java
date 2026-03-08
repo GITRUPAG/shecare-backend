@@ -1,16 +1,18 @@
 package com.app.shecare.service;
 
-import com.app.shecare.entity.PasswordResetToken;
-import com.app.shecare.entity.User;
-import com.app.shecare.repository.PasswordResetTokenRepository;
-import com.app.shecare.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
+import com.app.shecare.entity.PasswordResetToken;
+import com.app.shecare.entity.User;
+import com.app.shecare.repository.PasswordResetTokenRepository;
+import com.app.shecare.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +23,7 @@ public class PasswordResetService {
     private final EmailService                 emailService;
     private final PasswordEncoder              passwordEncoder;
 
-    @Value("${app.frontend-url:https://shecare.fit}")
+    @Value("${app_frontend_url:https://shecare.fit}")
     private String frontendUrl;
 
     private static final int EXPIRY_MINUTES = 15;
