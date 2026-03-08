@@ -10,4 +10,6 @@ public interface CommunityRepostRepository
 
     Optional<CommunityRepost> findByPostIdAndUserId(String postId, Long userId);
 
+    void deleteByPostId(String postId);
+
 }

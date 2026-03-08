@@ -12,4 +12,6 @@ public interface CommunityLikeRepository
 
     long countByPostId(String postId);
 
+    void deleteByPostId(String postId);
+
 }

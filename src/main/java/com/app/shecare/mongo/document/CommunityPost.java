@@ -53,4 +53,6 @@ public class CommunityPost {
 
     private int score;
 
+    private LocalDateTime editedAt;
+
 }

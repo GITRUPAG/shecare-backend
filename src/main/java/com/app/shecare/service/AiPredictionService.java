@@ -25,14 +25,21 @@ public class AiPredictionService {
     private final WebClient webClient = WebClient.create();
 
     public Object predictFromDates(Object request) {
-
-        return webClient.post()
-                .uri(aiUrl + "/predict/from-dates")
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(Object.class)
-                .block();
-    }
+    System.out.println("🔵 AI predictFromDates request: " + request);
+    
+    return webClient.post()
+            .uri(aiUrl + "/predict/from-dates")
+            .bodyValue(request)
+            .retrieve()
+            .onStatus(status -> status.is4xxClientError(), clientResponse ->
+                clientResponse.bodyToMono(String.class)
+                    .doOnNext(body -> System.out.println("🔴 ML 400 error body: " + body))
+                    .then(reactor.core.publisher.Mono.error(
+                        new RuntimeException("ML service rejected request")))
+            )
+            .bodyToMono(Object.class)
+            .block();
+}
 
     public Object getPhaseInsights(Object request) {
 

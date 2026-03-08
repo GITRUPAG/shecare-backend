@@ -64,6 +64,16 @@ public class Profile {
     private String emergencyContactName;
     private String emergencyContactNumber;
 
+    // PCOS symptom flags — 0 or 1
+    private Integer pcosWeightGain;
+    private Integer pcosHairGrowth;
+    private Integer pcosSkinDarkening;
+    private Integer pcosPimples;
+    private Double  pcosAmh;
+    private Double  pcosFsh;
+    private Double  pcosLh;
+    private Double  pcosWaistHipRatio;
+
     // 🔹 Preferences
     @Builder.Default
     @Column(nullable = false)

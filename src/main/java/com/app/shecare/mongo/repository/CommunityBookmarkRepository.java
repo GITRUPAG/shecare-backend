@@ -13,4 +13,6 @@ public interface CommunityBookmarkRepository
 
     List<CommunityBookmark> findByUserId(Long userId);
 
+    void deleteByPostId(String postId);
+
 }

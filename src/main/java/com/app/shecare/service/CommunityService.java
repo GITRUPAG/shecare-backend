@@ -326,4 +326,59 @@ public class CommunityService {
         return postRepository
                 .findAllByOrderByScoreDescCreatedAtDesc(pageable);
     }
+
+    public String deletePost(User user, String postId) {
+
+    CommunityPost post = postRepository.findById(postId)
+            .orElseThrow(() -> new RuntimeException("Post not found"));
+
+    if (!post.getUserId().equals(user.getId())) {
+        throw new RuntimeException("You can only delete your own posts");
+    }
+
+    commentRepository.deleteByPostId(postId);   // cascade-delete comments
+    likeRepository.deleteByPostId(postId);       // cascade-delete likes
+    repostRepository.deleteByPostId(postId);     // cascade-delete reposts
+    bookmarkRepository.deleteByPostId(postId);   // cascade-delete bookmarks
+    postRepository.deleteById(postId);
+
+    return "Post deleted successfully";
+}
+
+public CommunityPost editPost(
+        User user,
+        String postId,
+        CreatePostRequest request,
+        MultipartFile file
+) {
+    CommunityPost post = postRepository.findById(postId)
+            .orElseThrow(() -> new RuntimeException("Post not found"));
+
+    if (!post.getUserId().equals(user.getId())) {
+        throw new RuntimeException("You can only edit your own posts");
+    }
+
+    // Toxicity check on updated content
+    var toxicity = aiPredictionService.checkToxicity(request.getContent());
+    if (toxicity.is_toxic() && "critical".equalsIgnoreCase(toxicity.getSeverity())) {
+        throw new RuntimeException("Edit blocked due to harmful content");
+    }
+
+    // Replace media if a new file is provided
+    if (file != null && !file.isEmpty()) {
+        String mediaUrl = cloudinaryService.uploadImage(file);
+        String contentType = file.getContentType();
+        String mediaType = (contentType != null && contentType.startsWith("video")) ? "VIDEO" : "IMAGE";
+        post.setMediaUrls(List.of(mediaUrl));
+        post.setMediaType(mediaType);
+    }
+
+    post.setContent(request.getContent());
+    post.setCategory(request.getCategory());
+    post.setAnonymous(request.isAnonymous());
+    post.setHashtags(request.getHashtags());
+    post.setEditedAt(LocalDateTime.now());   // add this field to CommunityPost
+
+    return postRepository.save(post);
+}
 }

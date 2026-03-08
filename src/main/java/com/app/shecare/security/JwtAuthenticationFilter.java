@@ -36,12 +36,29 @@ protected void doFilterInternal(HttpServletRequest request,
 
     String token = authHeader.substring(7);
 
-    if (!jwtService.isTokenValid(token)) {
-        filterChain.doFilter(request, response);
-        return;
-    }
-
     String username = jwtService.extractUsername(token);
+
+if (username != null &&
+        SecurityContextHolder.getContext().getAuthentication() == null) {
+
+    var userDetails = userDetailsService.loadUserByUsername(username);
+
+    if (jwtService.isTokenValid(token, userDetails)) {
+
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
+
+        authToken.setDetails(
+                new WebAuthenticationDetailsSource().buildDetails(request)
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+    }
+}
 
     if (username != null &&
             SecurityContextHolder.getContext().getAuthentication() == null) {

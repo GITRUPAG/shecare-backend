@@ -17,4 +17,6 @@ public class HealthRiskResponse {
     private List<String> factors;
 
     private List<String> recommendations;
+
+     private String pcosRisk;
 }

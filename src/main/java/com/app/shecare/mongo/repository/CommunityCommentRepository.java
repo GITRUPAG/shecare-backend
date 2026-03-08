@@ -15,4 +15,6 @@ public interface CommunityCommentRepository
     // replies of a comment
     List<CommunityComment> findByParentCommentIdOrderByCreatedAtAsc(String parentCommentId);
 
+    void deleteByPostId(String postId);
+
 }

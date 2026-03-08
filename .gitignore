@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+firebase-service-account.json
+env.yaml
+application.properties
+application.properties.txt

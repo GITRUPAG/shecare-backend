@@ -8,11 +8,14 @@ import com.app.shecare.security.CustomUserDetails;
 import com.app.shecare.service.CommunityService;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/api/community")
@@ -21,24 +24,34 @@ public class CommunityController {
 
     private final CommunityService communityService;
 
-    @PostMapping("/posts")
+    @PostMapping(value = "/posts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 public CommunityPost createPost(
-    @AuthenticationPrincipal CustomUserDetails userDetails,
-    @RequestPart("data") CreatePostRequest request,
-    @RequestPart(value = "file", required = false) MultipartFile file
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestParam String content,
+        @RequestParam boolean anonymous,
+        @RequestParam String category,
+        @RequestParam(required = false) List<String> hashtags,
+        @RequestPart(value = "file", required = false) MultipartFile file
 ) {
+        if (hashtags == null) {
+    hashtags = new ArrayList<>();
+}
+
+    CreatePostRequest request = new CreatePostRequest();
+    request.setContent(content);
+    request.setAnonymous(anonymous);
+    request.setCategory(category);
+    request.setHashtags(hashtags);
+
     return communityService.createPost(userDetails.getUser(), request, file);
 }
 
     @GetMapping("/feed")
-    public List<CommunityPost> getFeed(
-
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) String hashtag,
-            @RequestParam(defaultValue = "0") int page
-
-    ) {
-
+public List<CommunityPost> getFeed(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(required = false) String category,
+        @RequestParam(required = false) String hashtag
+) {
         return communityService.getFeed(category, hashtag, page);
 
     }
@@ -191,5 +204,37 @@ public List<CommunityPost> trendingPosts(
 
     return communityService.getTrendingPosts(page);
 }
+
+@DeleteMapping("/posts/{postId}")
+public String deletePost(
+        @PathVariable String postId,
+        @AuthenticationPrincipal CustomUserDetails userDetails
+) {
+    return communityService.deletePost(userDetails.getUser(), postId);
+}
+
+@PutMapping(value = "/posts/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public CommunityPost editPost(
+        @PathVariable String postId,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestParam String content,
+        @RequestParam String category,
+        @RequestParam boolean anonymous,
+        @RequestParam(required = false) List<String> hashtags,
+        @RequestPart(value = "file", required = false) MultipartFile file
+) {
+    if (hashtags == null) hashtags = new ArrayList<>();
+
+    CreatePostRequest request = new CreatePostRequest();
+    request.setContent(content);
+    request.setCategory(category);
+    request.setAnonymous(anonymous);
+    request.setHashtags(hashtags);
+
+    return communityService.editPost(userDetails.getUser(), postId, request, file);
+}
+
+// Already exists as GET /bookmarks — just make sure it's wired:
+// @GetMapping("/bookmarks") is already in your controller ✅
 
 }

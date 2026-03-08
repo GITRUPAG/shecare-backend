@@ -90,33 +90,39 @@ public class ProfileService {
 
     public BmiResponse calculateBmi(User user) {
 
-    double heightCm = user.getProfile().getHeight();
-    double weightKg = user.getProfile().getWeight();
+        Profile profile = user.getProfile();
 
-    double heightMeters = heightCm / 100;
+        // ✅ Return null safely if profile or measurements are missing
+        if (profile == null
+                || profile.getHeight() == null
+                || profile.getWeight() == null
+                || profile.getHeight() == 0) {
+            return null;
+        }
 
-    double bmi = weightKg / (heightMeters * heightMeters);
+        double heightCm = profile.getHeight();
+        double weightKg = profile.getWeight();
+        double heightMeters = heightCm / 100.0;
+        double bmi = weightKg / (heightMeters * heightMeters);
 
-    String category;
+        String category;
+        if (bmi < 18.5) {
+            category = "Underweight";
+        } else if (bmi < 25) {
+            category = "Normal";
+        } else if (bmi < 30) {
+            category = "Overweight";
+        } else {
+            category = "Obese";
+        }
 
-    if (bmi < 18.5) {
-        category = "Underweight";
-    } else if (bmi < 25) {
-        category = "Normal";
-    } else if (bmi < 30) {
-        category = "Overweight";
-    } else {
-        category = "Obese";
+        return BmiResponse.builder()
+                .bmi(Math.round(bmi * 10.0) / 10.0)
+                .category(category)
+                .build();
     }
 
-    return BmiResponse.builder()
-            .bmi(Math.round(bmi * 10.0) / 10.0)
-            .category(category)
-            .build();
-}
-
-public int calculateAge(LocalDate dob) {
-    return Period.between(dob, LocalDate.now()).getYears();
-}
-
+    public int calculateAge(LocalDate dob) {
+        return Period.between(dob, LocalDate.now()).getYears();
+    }
 }
