@@ -1,0 +1,6 @@
+API	Method	Purpose
+/auth/register	POST	Register user
+/auth/login	POST	Login & get JWT
+/api/profile/me	GET	Get profile
+/api/profile/me	PUT	Update profile
+/api/profile/upload-image	POST	Upload profile picture
