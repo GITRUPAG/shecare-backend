@@ -28,6 +28,8 @@ public class FirebaseConfig {
                 FirebaseOptions options;
 
                 String serviceAccountJson = System.getenv("FIREBASE_SERVICE_ACCOUNT_JSON");
+                System.out.println("SPRING_DATA_MONGODB_URI = "
+        + System.getenv("SPRING_DATA_MONGODB_URI"));
                 System.out.println("FIREBASE_SERVICE_ACCOUNT_JSON present: "
                     + (serviceAccountJson != null && !serviceAccountJson.isBlank()));
 
