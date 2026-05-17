@@ -1,11 +1,26 @@
 package com.app.shecare.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "profiles")
@@ -78,7 +93,7 @@ public class Profile {
     private Boolean notificationsEnabled = true;
     @Builder.Default
     @Column(nullable = false)
-    private Boolean darkModeEnabled = false;
+    private boolean darkModeEnabled = false;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

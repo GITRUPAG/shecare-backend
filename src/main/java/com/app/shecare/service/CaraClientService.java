@@ -1,13 +1,19 @@
 package com.app.shecare.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +22,8 @@ public class CaraClientService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String CARA_URL = "http://192.168.0.101:8001/chat/sync";
+    @Value("${cara.service.url}")
+    private String caraUrl;
 
     public CaraResponse sendMessage(String token, String message) {
 
@@ -28,13 +35,26 @@ public class CaraClientService {
                 new HttpEntity<>(Map.of("message", message), headers);
 
         try {
-            ResponseEntity<String> res =
-                    restTemplate.postForEntity(CARA_URL, request, String.class);
 
+            ResponseEntity<String> res =
+                    restTemplate.postForEntity(
+                            
+                            caraUrl + "/chat/sync",
+                            request,
+                            String.class
+                    );
+
+           System.out.println("Calling Cara URL: " + caraUrl + "/chat/sync");
+System.out.println("Token: " + token);
+System.out.println("Message: " + message);
             String body = res.getBody();
 
             if (body == null || body.isBlank()) {
-                return new CaraResponse("I'm here for you 💗", "neutral", false);
+                return new CaraResponse(
+                        "I'm here for you 💗",
+                        "neutral",
+                        false
+                );
             }
 
             JsonNode json = objectMapper.readTree(body);
@@ -46,6 +66,7 @@ public class CaraClientService {
             );
 
         } catch (Exception e) {
+
             return new CaraResponse(
                     "I'm having a small delay, but I'm here 💗",
                     "neutral",
@@ -54,5 +75,9 @@ public class CaraClientService {
         }
     }
 
-    public record CaraResponse(String reply, String emotion, boolean crisis) {}
+    public record CaraResponse(
+            String reply,
+            String emotion,
+            boolean crisis
+    ) {}
 }

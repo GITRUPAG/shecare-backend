@@ -2,8 +2,8 @@ package com.app.shecare.service;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.temporal.ChronoUnit;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,7 +12,6 @@ import com.app.shecare.entity.Profile;
 import com.app.shecare.entity.User;
 import com.app.shecare.repository.ProfileRepository;
 import com.app.shecare.repository.UserRepository;
-import java.time.temporal.ChronoUnit;
 
 import lombok.RequiredArgsConstructor;
 
@@ -69,7 +68,7 @@ public class ProfileService {
         profile.setEmergencyContactNumber(request.getEmergencyContactNumber());
 
         profile.setNotificationsEnabled(request.getNotificationsEnabled());
-        profile.setDarkModeEnabled(request.getDarkModeEnabled());
+        profile.setDarkModeEnabled(request.isDarkModeEnabled());
 
         validateDateOfBirth(request.getDateOfBirth());
 
